@@ -75,15 +75,19 @@ namespace MyBrowser
         }
 
         
-        void updateHistoryMenu(String URL)
+        void updateHistoryMenu()
         {
             iniHistory();
-            // foreach (Widget Child in HistoryMenuBox.Children)
-            //     HistoryMenuBox.Remove(Child);
+            foreach (Widget Child in HistoryMenuBox.Children)
+                HistoryMenuBox.Remove(Child);
             
-            ModelButton Tmp = new ModelButton();
             foreach (String s in history){
+                ModelButton Tmp = new ModelButton();
                 Tmp.Text = s;
+                Tmp.Show();
+                Tmp.Clicked += async delegate {
+                    await navigateTo(s);
+                };
                 HistoryMenuBox.Add(Tmp);
             }
         }
@@ -120,6 +124,7 @@ namespace MyBrowser
                 }
             };
             
+            updateHistoryMenu();
         }
 
         // quit
@@ -226,7 +231,7 @@ namespace MyBrowser
                 Current = BackList.Count;
             }
 
-            updateHistoryMenu(URL);
+            updateHistoryMenu();
             // try{
             //     updateHistoryMenu(URL);
             // }
