@@ -1,4 +1,8 @@
 www.bing.com
-www.macs.hw.ac.uk
+https://www2.macs.hw.ac.uk/~yw2007/
 168.138.47.113/404/
-www.google.com
+http://www.facebook.com
+www.bing.com
+http://status.savanttools.com/?code=400%20Bad%20Request
+status.savanttools.com/?code=403%20Forbidden
+http://status.savanttools.com/?code=404%20Not%20Found

@@ -21,7 +21,7 @@ namespace MyBrowser
                 AutomaticDecompression = System.Net.DecompressionMethods.All,
             };
             client = new HttpClient(Handler);
-            client.Timeout = TimeSpan.FromSeconds(5);
+            client.Timeout = TimeSpan.FromSeconds(50);
         }
 
         async Task fetchFile(string Path)

@@ -12,6 +12,7 @@ namespace MyBrowser
     {
         // statement UI
         [UI] SearchEntry URLBar = null;
+        [UI] SearchEntry BulkBar = null; // string "Bulk.txt"
         [UI] TextView TextView = null;
         [UI] Button HomeButton = null;
         [UI] Button PrevButton = null;
@@ -94,6 +95,8 @@ namespace MyBrowser
 
             DeleteEvent += Window_DeleteEvent;
             URLBar.Activated += OnUrlEnter;
+            BulkBar.Activated += OnpathEnter;
+
             //home page
             HomeButton.Clicked += async delegate
             {
@@ -118,6 +121,23 @@ namespace MyBrowser
                     await navigateTo(BackList[Current-1], false);
                 }
             };
+
+            // BulkButton.Clicked += async delegate
+            // {
+            //     // try{
+            //         int counter = 0;
+            //         foreach (string line in System.IO.File.ReadLines(@"Bulk.txt")) {
+            //             log(BulkBar.Text);
+            //             // URLBar.Text = URL;
+            //             // await Fetcher.fetch(URLBar.Text);
+            //             // int BodyLength = Fetcher.Body.Length;
+            //             // log("Fetched content with code: " + Fetcher.Code + " in " + BodyLength + " bytes");
+
+            //             counter++;
+            //         }
+            //     // }
+            //     // catch{log("open Bulk.txt faild");}
+            // };
         }
 
         // quit
@@ -141,18 +161,14 @@ namespace MyBrowser
                 try{
                     int counter = 0;
                     foreach (string line in System.IO.File.ReadLines(@"Bulk.txt")) {
-                        log(line);
-                        // request line
-                        // get statuscode len(html) and url
+                        await Fetcher.fetch(URLBar.Text);
+                        int BodyLength = Fetcher.Body.Length;
+                        log("Fetched content with code: " + Fetcher.Code + " in " + BodyLength + " bytes");
+
                         counter++;
                     }
-                    }
-                    catch{log("open Bulk.txt faild");}
-
-                    // try{
-                    //     foreach()
-                    // }
-                    // catch{log("open Bulk.txt faild");}
+                }
+                catch{log("open Bulk.txt faild");}
             };
             
 
@@ -254,6 +270,31 @@ namespace MyBrowser
 
         private async void OnUrlEnter(object sender, EventArgs args){
             await navigateTo(URLBar.Text, false);
+        }
+
+        private async void OnpathEnter(object sender, EventArgs args){
+            BulkButton.Clicked += async delegate
+            {
+                // try{
+                    // int counter = 0;
+                    foreach (string line in System.IO.File.ReadLines(BulkBar.Text)) {
+                        if (!line.Contains("://")){
+                            String link = "http://" + line;
+                            await Fetcher.fetch(link);
+                        }
+                        else{
+                            await Fetcher.fetch(line);
+                        }
+                        int BodyLength = Fetcher.Body.Length;
+                        log("<" + Fetcher.Code + "> <" + BodyLength + "> <" + line + ">");
+                        // log("link: " + line);
+
+                        // counter++;
+                    }
+                // }
+                // catch{log("open Bulk.txt faild");}
+            };
+            
         }
     }
 }

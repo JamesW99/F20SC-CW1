@@ -1,6 +1,5 @@
 using System;
 using Gtk;
-using System.Collections.Generic;
 
 namespace MyBrowser
 {
@@ -22,7 +21,5 @@ namespace MyBrowser
             Application.Run();
             
         }
-
-        
     }
 }
