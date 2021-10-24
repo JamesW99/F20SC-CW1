@@ -52,18 +52,6 @@ namespace MyBrowser
             }
         }
 
-
-        
-        // public static List<String> history =  new List<string>();
-        // void iniHistory(){
-        //     int counter = 0;
-        //     foreach (string line in System.IO.File.ReadLines(@"History.txt")) 
-        //     {  
-        //         history.Add(line);
-        //         counter++;  
-        //     }
-        // }
-
         public  List<String> history =  new List<string>();
         void iniHistory(){
             int counter = 0;
@@ -72,15 +60,6 @@ namespace MyBrowser
                 history.Add(line);
                 counter++;
             }
-        }
-
-        
-        void updateHistoryMenu()
-        {
-            iniHistory();
-            foreach (Widget Child in HistoryMenuBox.Children)
-                HistoryMenuBox.Remove(Child);
-            
             foreach (String s in history){
                 ModelButton Tmp = new ModelButton();
                 Tmp.Text = s;
@@ -91,11 +70,27 @@ namespace MyBrowser
                 HistoryMenuBox.Add(Tmp);
             }
         }
+       
+        void updateHistoryMenu(String URL)
+        {
+            
+            ModelButton Tmp = new ModelButton();
+            Tmp.Text = URL;
+            Tmp.Show();
+            Tmp.Clicked += async delegate {
+                await navigateTo(URL);
+            };
+            HistoryMenuBox.Add(Tmp);
+            
+        }
 
         // homepage
         private MainWindow(Builder builder) : base(builder.GetRawOwnedObject("MainWindow"))
         {
             builder.Autoconnect(this);
+
+            iniHistory();
+            
 
             DeleteEvent += Window_DeleteEvent;
             URLBar.Activated += OnUrlEnter;
@@ -123,8 +118,6 @@ namespace MyBrowser
                     await navigateTo(BackList[Current-1], false);
                 }
             };
-            
-            updateHistoryMenu();
         }
 
         // quit
@@ -204,6 +197,8 @@ namespace MyBrowser
 
         async Task navigateTo(string URL, bool Save = false)
         {
+            updateHistoryMenu(URL);
+
             if (!URL.Contains("://"))
                 URL = "http://" + URL;
             log("Requesting " + URL);
@@ -230,15 +225,6 @@ namespace MyBrowser
             else{
                 Current = BackList.Count;
             }
-
-            updateHistoryMenu();
-            // try{
-            //     updateHistoryMenu(URL);
-            // }
-            // catch(Exception e){
-            //     log("Failed to updateHistoryMenu: " + e);
-            // }
-
 
             // request
             try{
