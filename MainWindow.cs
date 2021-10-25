@@ -49,14 +49,13 @@ namespace MyBrowser
         // iniFavorite
         public void DeSerializeNow() {  
             try{
-                object c = fav;
                 using (FileStream fs = File.OpenRead("favorite.dat")) {
                 BinaryFormatter b = new BinaryFormatter();  
-                c = (List<string>) b.Deserialize(fs);
+                fav = (List <KeyValuePair <string, string>>) b.Deserialize(fs);
                 }
-            }catch{}
-
-            
+            }catch (Exception e) {
+              log("failed to read favorite: " + e);
+            }
         } 
         
         void updateGotoMenu(Parser Parser)
