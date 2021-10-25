@@ -159,10 +159,19 @@ namespace MyBrowser
               Gtk.ResponseType response = (Gtk.ResponseType) fcd.Run ();
               if (response == Gtk.ResponseType.Ok)
               {
-                String text = await File.ReadAllTextAsync(fcd.Filename);
-                log("Opened file with " + text);
+                foreach (string line in System.IO.File.ReadLines(fcd.Filename)) {
+                    if (!line.Contains("://")){
+                            String link = "http://" + line;
+                            await Fetcher.fetch(link);
+                        }
+                        else{
+                            await Fetcher.fetch(line);
+                        }
+                        int BodyLength = Fetcher.Body.Length;
+                        log("<" + Fetcher.Code + "> <" + BodyLength + "> <" + line + ">");
+                }
               }
-              fcd.Destroy();
+              try{fcd.Destroy();} catch{}
             };
 
             //home page
@@ -199,6 +208,23 @@ namespace MyBrowser
             FavoriteMenuButton.Clicked += async delegate
             {
                 // AddFavorite();
+            };
+            
+            // BulkButton right Clicked
+            BulkDownloadButton.ButtonPressEvent += async delegate (object x, ButtonPressEventArgs y) 
+            {
+                // foreach (string line in System.IO.File.ReadLines(@"bulk.txt")) 
+                foreach (string line in System.IO.File.ReadLines(@"bulk.txt")) {
+                        if (!line.Contains("://")){
+                            String link = "http://" + line;
+                            await Fetcher.fetch(link);
+                        }
+                        else{
+                            await Fetcher.fetch(line);
+                        }
+                        int BodyLength = Fetcher.Body.Length;
+                        log("<" + Fetcher.Code + "> <" + BodyLength + "> <" + line + ">");
+                }
             };
 
             Fetcher = new Fetcher();
@@ -340,12 +366,7 @@ namespace MyBrowser
                         }
                         int BodyLength = Fetcher.Body.Length;
                         log("<" + Fetcher.Code + "> <" + BodyLength + "> <" + line + ">");
-                        // log("link: " + line);
-
-                        // counter++;
                     }
-                // }
-                // catch{log("open Bulk.txt faild");}
             };
             
         }
