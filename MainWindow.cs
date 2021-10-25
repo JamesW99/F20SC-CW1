@@ -24,10 +24,13 @@ namespace MyBrowser
         [UI] Box GotoMenuBox = null;
         [UI] Box HistoryMenuBox = null;
         [UI] Button BulkDownloadButton = null;
+        [UI] Button FavoriteButton = null;
+        List <KeyValuePair <string, string>> fav = new List <KeyValuePair<string, string>>();
 
         public static HttpClient client = null;
 
         Fetcher Fetcher;
+        String webtitle = "";
 
         // List<string> BackList;
         List<string> BackList = new List<string>();
@@ -36,18 +39,24 @@ namespace MyBrowser
         public MainWindow() : this(new Builder("MainWindow.glade")) { }
 
         public void SerializeNow() {  
-            object c = BackList;
-            using (FileStream fs = File.OpenWrite("temp.dat")) {
+            object c = fav;
+            using (FileStream fs = File.OpenWrite("favorite.dat")) {
               BinaryFormatter b = new BinaryFormatter();
               b.Serialize(fs, c);
+              log("SerializeNow success!");
             }
         }  
+        // iniFavorite
         public void DeSerializeNow() {  
-            object c = BackList;
-            using (FileStream fs = File.OpenRead("temp.dat")) {
-              BinaryFormatter b = new BinaryFormatter();  
-              c = (List<string>) b.Deserialize(fs);
-            }
+            try{
+                object c = fav;
+                using (FileStream fs = File.OpenRead("favorite.dat")) {
+                BinaryFormatter b = new BinaryFormatter();  
+                c = (List<string>) b.Deserialize(fs);
+                }
+            }catch{}
+
+            
         } 
         
         void updateGotoMenu(Parser Parser)
@@ -67,13 +76,13 @@ namespace MyBrowser
                 GotoMenuBox.Add(Tmp);
             }
         }
-
-        void updateFavoriteMenu(Parser Parser)
+        
+        void updateFavoriteMenu()
         {
-            foreach (Widget Child in GotoMenuBox.Children)
-                GotoMenuBox.Remove(Child);
+            foreach (Widget Child in FavoriteMenuButton.Children)
+                FavoriteMenuButton.Remove(Child);
 
-            foreach (KeyValuePair<String, Uri> KV in Parser.findLinks())
+            foreach (KeyValuePair<string, string> KV in fav)
             {
                 ModelButton Tmp = new ModelButton();
                 Tmp.Text = KV.Key;
@@ -82,11 +91,17 @@ namespace MyBrowser
                     Console.WriteLine("??? activated!");
                     await navigateTo(KV.Value.ToString(), true);
                 };
-                GotoMenuBox.Add(Tmp);
+                FavoriteMenuButton.Add(Tmp);
             }
         }
 
+        // void FavoriteAddButton(){
+        //     KeyValuePair<String, String> tmp = new KeyValuePair<string, string>(webtitle ,URLBar.Text);
+        //     fav.Add(tmp);
+        // }
+
         public  List<String> history =  new List<string>();
+        
         void iniHistory(){
             int counter = 0;
             foreach (string line in System.IO.File.ReadLines(@"History.txt")) 
@@ -110,7 +125,6 @@ namespace MyBrowser
        
         void updateHistoryMenu(String URL)
         {
-            
             ModelButton Tmp = new ModelButton();
             Tmp.Text = URL;
             Tmp.Show();
@@ -127,6 +141,8 @@ namespace MyBrowser
             builder.Autoconnect(this);
 
             iniHistory();
+            DeSerializeNow();
+            updateFavoriteMenu();
 
             DeleteEvent += Window_DeleteEvent;
             URLBar.Activated += OnUrlEnter;
@@ -174,10 +190,15 @@ namespace MyBrowser
                 }
             };
             
+            FavoriteButton.Clicked += async delegate{
+                AddFavorite();
+                // FavoriteAddButton();
+            };
+
             // add Favorite
             FavoriteMenuButton.Clicked += async delegate
             {
-                AddFavorite();
+                // AddFavorite();
             };
 
             Fetcher = new Fetcher();
@@ -202,15 +223,20 @@ namespace MyBrowser
         async Task AddFavorite()
         {
             //add a side to Favorite.txt
-            try
-            {
-                using StreamWriter file = new("Favorite.txt", append: true);
-                await file.WriteLineAsync(URLBar.Text);
-            }
-            catch (Exception e)
-            {
-                log("Failed to add: " + e);
-            }
+            // try
+            // {
+            //     using StreamWriter file = new("Favorite.txt", append: true);
+            //     await file.WriteLineAsync(URLBar.Text);
+            // }
+            // catch (Exception e)
+            // {
+            //     log("Failed to add: " + e);
+            // }
+            KeyValuePair<String, String> tmp = new KeyValuePair<string, string>(webtitle ,URLBar.Text);
+            fav.Add(tmp);
+            log(tmp.Key + " "+tmp.Value);
+            SerializeNow();
+            
         }
 
         async Task DeleteFavorite(String link)
@@ -287,10 +313,12 @@ namespace MyBrowser
                 Title =  "Status Code: " + Fetcher.Code + ", Web Title: " + Parser.getTitle();
                 log("Text content:\n" + Parser.getTextSummary());
                 updateGotoMenu(Parser);
+                webtitle = Parser.getTitle();
             }
             catch (Exception e){
                 log("Failed to parse: " + e);
             }
+            
         }
 
         private async void OnUrlEnter(object sender, EventArgs args){
