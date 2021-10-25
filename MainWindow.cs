@@ -34,7 +34,6 @@ namespace MyBrowser
 
         public MainWindow() : this(new Builder("MainWindow.glade"))
         {
-            Fetcher = new Fetcher();
         }
 
         void updateGotoMenu(Parser Parser)
@@ -164,7 +163,8 @@ namespace MyBrowser
                 AddFavorite();
             };
 
-            navigateTo("http://www2.macs.hw.ac.uk/~yw2007/", true);   
+            Fetcher = new Fetcher();
+            navigateTo("http://www2.macs.hw.ac.uk/~yw2007/", true);
         }
 
         // quit
