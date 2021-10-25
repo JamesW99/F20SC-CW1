@@ -21,6 +21,7 @@ namespace MyBrowser
         [UI] Button NextButton = null;
         [UI] Box GotoMenuBox = null;
         [UI] Box HistoryMenuBox = null;
+        [UI] Button BulkDownloadButton = null;
 
         public static HttpClient client = null;
 
@@ -114,6 +115,23 @@ namespace MyBrowser
             DeleteEvent += Window_DeleteEvent;
             URLBar.Activated += OnUrlEnter;
             BulkBar.Activated += OnpathEnter;
+
+            BulkDownloadButton.Clicked += async delegate
+            {
+              FileChooserDialog fcd = new Gtk.FileChooserDialog ("Open File", null, Gtk.FileChooserAction.Open);
+              fcd.AddButton(Gtk.Stock.Cancel, Gtk.ResponseType.Cancel);
+              fcd.AddButton(Gtk.Stock.Open, Gtk.ResponseType.Ok);
+              fcd.DefaultResponse = Gtk.ResponseType.Ok;
+              fcd.SelectMultiple = false;
+
+              Gtk.ResponseType response = (Gtk.ResponseType) fcd.Run ();
+              if (response == Gtk.ResponseType.Ok)
+              {
+                String text = await File.ReadAllTextAsync(fcd.Filename);
+                log("Opened file with " + text);
+              }
+              fcd.Destroy();
+            };
 
             //home page
             HomeButton.Clicked += async delegate
