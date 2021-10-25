@@ -1,7 +1,7 @@
-using System;
-using Gtk;
-using System.IO;
 using UI = Gtk.Builder.ObjectAttribute;
+using Gtk;
+using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -36,21 +36,18 @@ namespace MyBrowser
         public MainWindow() : this(new Builder("MainWindow.glade")) { }
 
         public void SerializeNow() {  
-            ClassToSerialize c = new ClassToSerialize();  
-            System.IO.File f = new System.IO.File("temp.dat");  
-            Stream s = f.Open(FileMode.Create);  
-            BinaryFormatter b = new BinaryFormatter();  
-            b.Serialize(s, c);  
-            s.Close();  
+            object c = BackList;
+            using (FileStream fs = File.OpenWrite("temp.dat")) {
+              BinaryFormatter b = new BinaryFormatter();
+              b.Serialize(fs, c);
+            }
         }  
         public void DeSerializeNow() {  
-            ClassToSerialize c = new ClassToSerialize();  
-            System.IO.File f = new System.IO.File("temp.dat");  
-            Stream s = f.Open(FileMode.Open);  
-            BinaryFormatter b = new BinaryFormatter();  
-            c = (ClassToSerialize) b.Deserialize(s);  
-            Console.WriteLine(c.name);  
-            s.Close();  
+            object c = BackList;
+            using (FileStream fs = File.OpenRead("temp.dat")) {
+              BinaryFormatter b = new BinaryFormatter();  
+              c = (List<string>) b.Deserialize(fs);
+            }
         } 
         
         void updateGotoMenu(Parser Parser)
