@@ -1,6 +1,3 @@
 wwww.bing.com
 wwww.google.com
-http://ip.sb
-http://ip.sb
-http://ip.sb
-http://ip.sb
+http://IP.sb

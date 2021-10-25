@@ -54,6 +54,24 @@ namespace MyBrowser
             }
         }
 
+        void updateFavoriteMenu(Parser Parser)
+        {
+            foreach (Widget Child in GotoMenuBox.Children)
+                GotoMenuBox.Remove(Child);
+
+            foreach (KeyValuePair<String, Uri> KV in Parser.findLinks())
+            {
+                ModelButton Tmp = new ModelButton();
+                Tmp.Text = KV.Key;
+                Tmp.Show();
+                Tmp.Clicked += async delegate {
+                    Console.WriteLine("??? activated!");
+                    await navigateTo(KV.Value.ToString(), true);
+                };
+                GotoMenuBox.Add(Tmp);
+            }
+        }
+
         public  List<String> history =  new List<string>();
         void iniHistory(){
             int counter = 0;
@@ -100,8 +118,8 @@ namespace MyBrowser
             //home page
             HomeButton.Clicked += async delegate
             {
-                // await navigateTo("https://www2.macs.hw.ac.uk/~yw2007/", true);
-                await navigateTo("http://168.138.47.113/file/", true);
+                await navigateTo("https://www2.macs.hw.ac.uk/~yw2007/", true);
+                // await navigateTo("http://168.138.47.113/file/", true);
                 
             };
             //back 
@@ -121,18 +139,14 @@ namespace MyBrowser
                     await navigateTo(BackList[Current-1], false);
                 }
             };
-            FavoriteMenuButton.Clicked += async delegate{
-                try
-                {
-                    using StreamWriter file = new("Favorite.txt", append: true);
-                    await file.WriteLineAsync(URLBar.Text);
-                }
-                catch (Exception e)
-                {
-                    log("Failed to add: " + e);
-                }
+            
+            // add Favorite
+            FavoriteMenuButton.Clicked += async delegate
+            {
+                AddFavorite();
             };
-           
+
+            navigateTo("http://www2.macs.hw.ac.uk/~yw2007/", true);   
         }
 
         // quit
@@ -150,13 +164,13 @@ namespace MyBrowser
         }
 
 
-        async Task AddFavorite(string link)
+        async Task AddFavorite()
         {
             //add a side to Favorite.txt
             try
             {
                 using StreamWriter file = new("Favorite.txt", append: true);
-                await file.WriteLineAsync(link);
+                await file.WriteLineAsync(URLBar.Text);
             }
             catch (Exception e)
             {
