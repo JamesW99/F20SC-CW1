@@ -13,13 +13,14 @@ namespace MyBrowser
         // statement UI
         [UI] SearchEntry URLBar = null;
         [UI] SearchEntry BulkBar = null; // string "Bulk.txt"
+        [UI] Button BulkButton = null;
+        [UI] Button FavoriteMenuButton = null;
         [UI] TextView TextView = null;
         [UI] Button HomeButton = null;
         [UI] Button PrevButton = null;
         [UI] Button NextButton = null;
         [UI] Box GotoMenuBox = null;
         [UI] Box HistoryMenuBox = null;
-        [UI] Button BulkButton = null;
 
         public static HttpClient client = null;
 
@@ -91,7 +92,6 @@ namespace MyBrowser
             builder.Autoconnect(this);
 
             iniHistory();
-            
 
             DeleteEvent += Window_DeleteEvent;
             URLBar.Activated += OnUrlEnter;
@@ -121,23 +121,18 @@ namespace MyBrowser
                     await navigateTo(BackList[Current-1], false);
                 }
             };
-
-            // BulkButton.Clicked += async delegate
-            // {
-            //     // try{
-            //         int counter = 0;
-            //         foreach (string line in System.IO.File.ReadLines(@"Bulk.txt")) {
-            //             log(BulkBar.Text);
-            //             // URLBar.Text = URL;
-            //             // await Fetcher.fetch(URLBar.Text);
-            //             // int BodyLength = Fetcher.Body.Length;
-            //             // log("Fetched content with code: " + Fetcher.Code + " in " + BodyLength + " bytes");
-
-            //             counter++;
-            //         }
-            //     // }
-            //     // catch{log("open Bulk.txt faild");}
-            // };
+            FavoriteMenuButton.Clicked += async delegate{
+                try
+                {
+                    using StreamWriter file = new("Favorite.txt", append: true);
+                    await file.WriteLineAsync(URLBar.Text);
+                }
+                catch (Exception e)
+                {
+                    log("Failed to add: " + e);
+                }
+            };
+           
         }
 
         // quit
@@ -147,32 +142,13 @@ namespace MyBrowser
             Application.Quit();
         }
 
+
         void log(string Content)
         {
             Console.WriteLine(Content);
             TextView.Buffer.Text += Content + "\n";
         }
 
-        List<String> WaitForDownload =  new List<string>();
-        void BulkDownload()
-        {
-            BulkButton.Clicked += async delegate
-            {
-                try{
-                    int counter = 0;
-                    foreach (string line in System.IO.File.ReadLines(@"Bulk.txt")) {
-                        await Fetcher.fetch(URLBar.Text);
-                        int BodyLength = Fetcher.Body.Length;
-                        log("Fetched content with code: " + Fetcher.Code + " in " + BodyLength + " bytes");
-
-                        counter++;
-                    }
-                }
-                catch{log("open Bulk.txt faild");}
-            };
-            
-
-        }
 
         async Task AddFavorite(string link)
         {
@@ -180,7 +156,7 @@ namespace MyBrowser
             try
             {
                 using StreamWriter file = new("Favorite.txt", append: true);
-                // await file.WriteLineAsync(link);
+                await file.WriteLineAsync(link);
             }
             catch (Exception e)
             {
@@ -259,7 +235,7 @@ namespace MyBrowser
             // Show the html code
             try{
                 Parser Parser = new Parser(Fetcher.LastUri, Fetcher.Body);
-                Title = Parser.getTitle();
+                Title =  "Status Code: " + Fetcher.Code + ", Web Title: " + Parser.getTitle();
                 log("Text content:\n" + Parser.getTextSummary());
                 updateGotoMenu(Parser);
             }
@@ -269,7 +245,7 @@ namespace MyBrowser
         }
 
         private async void OnUrlEnter(object sender, EventArgs args){
-            await navigateTo(URLBar.Text, false);
+            await navigateTo(URLBar.Text, true);
         }
 
         private async void OnpathEnter(object sender, EventArgs args){
