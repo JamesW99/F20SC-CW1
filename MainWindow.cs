@@ -1,10 +1,12 @@
 using System;
 using Gtk;
+using System.IO;
 using UI = Gtk.Builder.ObjectAttribute;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.IO;
+using System.Runtime.Serialization;  
+using System.Runtime.Serialization.Formatters.Binary;  
 
 namespace MyBrowser
 {
@@ -31,11 +33,26 @@ namespace MyBrowser
         List<string> BackList = new List<string>();
         int Current;
         
+        public MainWindow() : this(new Builder("MainWindow.glade")) { }
 
-        public MainWindow() : this(new Builder("MainWindow.glade"))
-        {
-        }
-
+        public void SerializeNow() {  
+            ClassToSerialize c = new ClassToSerialize();  
+            System.IO.File f = new System.IO.File("temp.dat");  
+            Stream s = f.Open(FileMode.Create);  
+            BinaryFormatter b = new BinaryFormatter();  
+            b.Serialize(s, c);  
+            s.Close();  
+        }  
+        public void DeSerializeNow() {  
+            ClassToSerialize c = new ClassToSerialize();  
+            System.IO.File f = new System.IO.File("temp.dat");  
+            Stream s = f.Open(FileMode.Open);  
+            BinaryFormatter b = new BinaryFormatter();  
+            c = (ClassToSerialize) b.Deserialize(s);  
+            Console.WriteLine(c.name);  
+            s.Close();  
+        } 
+        
         void updateGotoMenu(Parser Parser)
         {
             foreach (Widget Child in GotoMenuBox.Children)
@@ -88,7 +105,7 @@ namespace MyBrowser
                     await navigateTo(s);
                 };
                 Tmp.ButtonPressEvent += async delegate (object x, ButtonPressEventArgs y) {
-                  log("event is " + y);
+                    log("event is " + y);
                 };
                 HistoryMenuBox.Add(Tmp);
             }
