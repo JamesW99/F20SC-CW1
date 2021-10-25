@@ -87,6 +87,9 @@ namespace MyBrowser
                 Tmp.Clicked += async delegate {
                     await navigateTo(s);
                 };
+                Tmp.ButtonPressEvent += async delegate (object x, ButtonPressEventArgs y) {
+                  log("event is " + y);
+                };
                 HistoryMenuBox.Add(Tmp);
             }
         }
