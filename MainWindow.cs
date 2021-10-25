@@ -24,7 +24,8 @@ namespace MyBrowser
         [UI] Box GotoMenuBox = null;
         [UI] Box HistoryMenuBox = null;
         [UI] Button BulkDownloadButton = null;
-        [UI] Button FavoriteButton = null;
+        [UI] Button FavoriteButton  = null;
+        [UI] Box FavoriteMenuBox = null;
         List <KeyValuePair <string, string>> fav = new List <KeyValuePair<string, string>>();
 
         public static HttpClient client = null;
@@ -78,8 +79,8 @@ namespace MyBrowser
         
         void updateFavoriteMenu()
         {
-            foreach (Widget Child in FavoriteMenuButton.Children)
-                FavoriteMenuButton.Remove(Child);
+            foreach (Widget Child in FavoriteMenuBox.Children)
+                FavoriteMenuBox.Remove(Child);
 
             foreach (KeyValuePair<string, string> KV in fav)
             {
@@ -90,7 +91,7 @@ namespace MyBrowser
                     Console.WriteLine("??? activated!");
                     await navigateTo(KV.Value.ToString(), true);
                 };
-                FavoriteMenuButton.Add(Tmp);
+                FavoriteMenuBox.Add(Tmp);
             }
         }
 
