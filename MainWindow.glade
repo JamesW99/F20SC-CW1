@@ -335,6 +335,16 @@
       </object>
     </child>
   </object>
+  <object class="GtkPopover" id="RenamePopover">
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkEntry" id="RenameEntry">
+        <property name="visible">True</property>
+        <property name="can-focus">True</property>
+        <property name="placeholder-text" translatable="yes">Enter new name...</property>
+      </object>
+    </child>
+  </object>
   <object class="GtkFileFilter" id="filefilter1">
     <patterns>
       <pattern>*.txt</pattern>

@@ -20,6 +20,7 @@ namespace MyBrowser
         [UI] TextView TextView = null;
         [UI] Button HomeButton = null;
         [UI] Button PrevButton = null;
+        [UI] Button Rename = null;
         [UI] Button NextButton = null;
         [UI] Box GotoMenuBox = null;
         [UI] Box HistoryMenuBox = null;
@@ -27,6 +28,8 @@ namespace MyBrowser
         [UI] Button FavoriteButton  = null;
         [UI] Box FavoriteMenuBox = null;
         [UI] Popover EditPopover = null;
+        [UI] Popover RenamePopover = null;
+        [UI] Entry RenameEntry = null;
         List <KeyValuePair <string, string>> fav = new List <KeyValuePair<string, string>>();
 
         public static HttpClient client = null;
@@ -230,6 +233,12 @@ namespace MyBrowser
                         int BodyLength = Fetcher.Body.Length;
                         log("<" + Fetcher.Code + "> <" + BodyLength + "> <" + line + ">");
                 }
+            };
+
+            RenamePopover.RelativeTo = Rename;
+            RenamePopover.Position = PositionType.Right;
+            Rename.Clicked += async delegate {
+                RenamePopover.Show();
             };
 
             Fetcher = new Fetcher();
