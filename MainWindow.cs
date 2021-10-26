@@ -37,6 +37,7 @@ namespace MyBrowser
 
         Fetcher Fetcher;
         String webtitle = "";
+        string home =  "http://www2.macs.hw.ac.uk/~yw2007/";
 
         // List<string> BackList;
         List<string> BackList = new List<string>();
@@ -147,6 +148,10 @@ namespace MyBrowser
         {
             builder.Autoconnect(this);
 
+            try{
+                home = System.IO.File.ReadAllText(@"home.txt");
+            }
+            catch{}
             iniHistory();
             DeSerializeNow();
             updateFavoriteMenu();
@@ -184,24 +189,38 @@ namespace MyBrowser
             //home page
             HomeButton.Clicked += async delegate
             {
-                await navigateTo("https://www2.macs.hw.ac.uk/~yw2007/", true);
+                await navigateTo(home, true);
+            };
+            HomeButton.ButtonPressEvent += async delegate (object x, ButtonPressEventArgs y) {
+                using StreamWriter file = new("home.txt", append: false);
+                await file.WriteLineAsync(URLBar.Text);
             };
             //back 
             PrevButton.Clicked += async delegate
             {
-                if (Current <= BackList.Count && Current > 1)
-                {   
-                    Current --;
-                    await navigateTo(BackList[Current-1], false);
-                }
+                try{
+                    if (Current > 1)
+                    {   
+                        
+                        await navigateTo(BackList[Current-2], false);
+                        log("Current2: "+ Current);
+                        log("lens2: "+ BackList.Count);
+                        Current --;
+                        log("Current3: "+ Current);
+                        log("lens3: "+ BackList.Count);
+                    }
+                }catch{}
             };
             NextButton.Clicked += async delegate
             {
-                if (Current < BackList.Count)
-                {
-                    Current ++;
-                    await navigateTo(BackList[Current-1], false);
-                }
+                
+                try{
+                    if (Current < BackList.Count)
+                    {
+                        navigateTo(BackList[Current], false);
+                        Current ++;
+                    }
+                }catch{}
             };
             
             // add Favorite
@@ -215,14 +234,9 @@ namespace MyBrowser
 
             // remove Favorite
             RemoveButton.Clicked += async delegate
-            { 
-                // try{
-                //     log("event is " + URLBar.Text);
-                // }catch{}
-                
+            {
                 log(Tmp.Text);
-                fav.RemoveAll(fav => fav.Value.Equals(Tmp.Text));
-                // fav.RemoveAll(fav => fav.Value.Equals(URLBar.Text));
+                fav.Remove(fav[0]);
                 SerializeNow();
                 updateFavoriteMenu();
             };
@@ -247,12 +261,21 @@ namespace MyBrowser
             RenamePopover.RelativeTo = Rename;
             RenamePopover.Position = PositionType.Right;
             Rename.Clicked += async delegate {
-                RenamePopover.Show();
                 RenameEntry.Activated += RenameFunc;
+                RenamePopover.Show();
+            };
+            
+            Rename.ButtonPressEvent += async delegate (object x, ButtonPressEventArgs y) {
+                string data = fav[0].Value;
+                fav.Remove(fav[0]);
+                KeyValuePair<string, string> tmp = new KeyValuePair<string, string>(RenameEntry.Text ,data);
+                fav.Add(tmp);
+                updateFavoriteMenu();
             };
 
+
             Fetcher = new Fetcher();
-            navigateTo("http://www2.macs.hw.ac.uk/~yw2007/", true);
+            navigateTo(home, true);
         }
 
         // quit
@@ -269,15 +292,6 @@ namespace MyBrowser
             TextView.Buffer.Text += Content + "\n";
         }
 
-
-        // async Task AddFavorite()
-        // {
-        //     KeyValuePair<String, String> tmp = new KeyValuePair<string, string>(webtitle ,URLBar.Text);
-        //     fav.Add(tmp);
-        //     log("adding favorite: " + tmp.Key + " for " + tmp.Value);
-        //     SerializeNow();
-        //     updateFavoriteMenu();
-        // }
 
         
         
