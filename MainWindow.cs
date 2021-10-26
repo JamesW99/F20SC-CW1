@@ -26,6 +26,7 @@ namespace MyBrowser
         [UI] Button BulkDownloadButton = null;
         [UI] Button FavoriteButton  = null;
         [UI] Box FavoriteMenuBox = null;
+        [UI] Popover EditPopover = null;
         List <KeyValuePair <string, string>> fav = new List <KeyValuePair<string, string>>();
 
         public static HttpClient client = null;
@@ -91,9 +92,10 @@ namespace MyBrowser
                     Console.WriteLine("??? activated!");
                     await navigateTo(KV.Value.ToString(), true);
                 };
-                // Tmp.ButtonPressEvent += async delegate (object x, ButtonPressEventArgs y) {
-                //     log("event is " + y);
-                // };
+                Tmp.ButtonPressEvent += async delegate (object x, ButtonPressEventArgs y) {
+                    EditPopover.RelativeTo = Tmp;
+                    EditPopover.Show();
+                };
                 FavoriteMenuBox.Add(Tmp);
             }
         }
