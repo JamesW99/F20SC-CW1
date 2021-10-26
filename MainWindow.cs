@@ -91,6 +91,9 @@ namespace MyBrowser
                     Console.WriteLine("??? activated!");
                     await navigateTo(KV.Value.ToString(), true);
                 };
+                // Tmp.ButtonPressEvent += async delegate (object x, ButtonPressEventArgs y) {
+                //     log("event is " + y);
+                // };
                 FavoriteMenuBox.Add(Tmp);
             }
         }
@@ -116,9 +119,9 @@ namespace MyBrowser
                 Tmp.Clicked += async delegate {
                     await navigateTo(s);
                 };
-                Tmp.ButtonPressEvent += async delegate (object x, ButtonPressEventArgs y) {
-                    log("event is " + y);
-                };
+                // Tmp.ButtonPressEvent += async delegate (object x, ButtonPressEventArgs y) {
+                //     log("event is " + y);
+                // };
                 HistoryMenuBox.Add(Tmp);
             }
         }
@@ -248,16 +251,6 @@ namespace MyBrowser
 
         async Task AddFavorite()
         {
-            //add a side to Favorite.txt
-            // try
-            // {
-            //     using StreamWriter file = new("Favorite.txt", append: true);
-            //     await file.WriteLineAsync(URLBar.Text);
-            // }
-            // catch (Exception e)
-            // {
-            //     log("Failed to add: " + e);
-            // }
             KeyValuePair<String, String> tmp = new KeyValuePair<string, string>(webtitle ,URLBar.Text);
             fav.Add(tmp);
             log(tmp.Key + " "+tmp.Value);
@@ -265,27 +258,7 @@ namespace MyBrowser
             
         }
 
-        async Task DeleteFavorite(String link)
-        {
-            try
-            {
-                // read favorite.txt to a string[]
-                string path = @"Favorite.txt";
-                StreamReader sr = new StreamReader(path);
-                sr.ReadLine().Replace(link,"");
-                string[] lines =
-                {
-                    "First line", "Second line", "Third line" 
-                };
-
-                await File.WriteAllLinesAsync("favorite.txt", lines);
-            }
-
-            catch (Exception e)
-            {
-                log("Failed to add delete the Favorite: " + e);
-            }
-        }
+        
         
 
         async Task navigateTo(string URL, bool Save = false)
