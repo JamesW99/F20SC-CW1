@@ -16,7 +16,7 @@ namespace MyBrowser
         [UI] SearchEntry URLBar = null;
         [UI] SearchEntry BulkBar = null; // string "Bulk.txt"
         [UI] Button BulkButton = null;
-        [UI] Button FavoriteMenuButton = null;
+        // [UI] Button FavoriteMenuButton = null;
         [UI] TextView TextView = null;
         [UI] Button HomeButton = null;
         [UI] Button PrevButton = null;
@@ -30,6 +30,7 @@ namespace MyBrowser
         [UI] Popover EditPopover = null;
         [UI] Popover RenamePopover = null;
         [UI] Entry RenameEntry = null;
+        [UI] Button RemoveButton  = null;
         List <KeyValuePair <string, string>> fav = new List <KeyValuePair<string, string>>();
 
         public static HttpClient client = null;
@@ -40,6 +41,7 @@ namespace MyBrowser
         // List<string> BackList;
         List<string> BackList = new List<string>();
         int Current;
+        ModelButton Tmp = new ModelButton();
         
         public MainWindow() : this(new Builder("MainWindow.glade")) { }
 
@@ -48,7 +50,7 @@ namespace MyBrowser
             using (FileStream fs = File.OpenWrite("favorite.dat")) {
               BinaryFormatter b = new BinaryFormatter();
               b.Serialize(fs, c);
-              log("SerializeNow success!");
+            //   log("add bookmark success!");
             }
         }  
         // iniFavorite
@@ -93,19 +95,17 @@ namespace MyBrowser
                 Tmp.Clicked += async delegate {
                     Console.WriteLine("??? activated!");
                     await navigateTo(KV.Value.ToString(), true);
+                    Tmp.Text = KV.Key;
                 };
                 Tmp.ButtonPressEvent += async delegate (object x, ButtonPressEventArgs y) {
                     EditPopover.RelativeTo = Tmp;
                     EditPopover.Show();
+                    Tmp.Text = KV.Key;
                 };
                 FavoriteMenuBox.Add(Tmp);
             }
         }
 
-        // void FavoriteAddButton(){
-        //     KeyValuePair<String, String> tmp = new KeyValuePair<string, string>(webtitle ,URLBar.Text);
-        //     fav.Add(tmp);
-        // }
 
         public  List<String> history =  new List<string>();
         
@@ -117,7 +117,7 @@ namespace MyBrowser
                 counter++;
             }
             foreach (String s in history){
-                ModelButton Tmp = new ModelButton();
+                
                 Tmp.Text = s;
                 Tmp.Show();
                 Tmp.Clicked += async delegate {
@@ -185,8 +185,6 @@ namespace MyBrowser
             HomeButton.Clicked += async delegate
             {
                 await navigateTo("https://www2.macs.hw.ac.uk/~yw2007/", true);
-                // await navigateTo("http://168.138.47.113/file/", true);
-                
             };
             //back 
             PrevButton.Clicked += async delegate
@@ -206,15 +204,27 @@ namespace MyBrowser
                 }
             };
             
+            // add Favorite
             FavoriteButton.Clicked += async delegate{
-                AddFavorite();
-                // FavoriteAddButton();
+                KeyValuePair<String, String> tmp = new KeyValuePair<string, string>(webtitle ,URLBar.Text);
+                fav.Add(tmp);
+                log("adding favorite: " + tmp.Key + " for " + tmp.Value);
+                SerializeNow();
+                updateFavoriteMenu();
             };
 
-            // add Favorite
-            FavoriteMenuButton.Clicked += async delegate
-            {
-                // AddFavorite();
+            // remove Favorite
+            RemoveButton.Clicked += async delegate
+            { 
+                // try{
+                //     log("event is " + URLBar.Text);
+                // }catch{}
+                
+                log(Tmp.Text);
+                fav.RemoveAll(fav => fav.Value.Equals(Tmp.Text));
+                // fav.RemoveAll(fav => fav.Value.Equals(URLBar.Text));
+                SerializeNow();
+                updateFavoriteMenu();
             };
             
             // BulkButton right Clicked
@@ -238,6 +248,7 @@ namespace MyBrowser
             RenamePopover.Position = PositionType.Right;
             Rename.Clicked += async delegate {
                 RenamePopover.Show();
+                RenameEntry.Activated += RenameFunc;
             };
 
             Fetcher = new Fetcher();
@@ -259,14 +270,14 @@ namespace MyBrowser
         }
 
 
-        async Task AddFavorite()
-        {
-            KeyValuePair<String, String> tmp = new KeyValuePair<string, string>(webtitle ,URLBar.Text);
-            fav.Add(tmp);
-            log("adding favorite: " + tmp.Key + " for " + tmp.Value);
-            SerializeNow();
-            updateFavoriteMenu();
-        }
+        // async Task AddFavorite()
+        // {
+        //     KeyValuePair<String, String> tmp = new KeyValuePair<string, string>(webtitle ,URLBar.Text);
+        //     fav.Add(tmp);
+        //     log("adding favorite: " + tmp.Key + " for " + tmp.Value);
+        //     SerializeNow();
+        //     updateFavoriteMenu();
+        // }
 
         
         
@@ -353,5 +364,12 @@ namespace MyBrowser
             };
             
         }
+
+        private async void RenameFunc(object sender, EventArgs args){
+            
+            string newname = RenameEntry.Text;
+        }
+
+        
     }
 }
