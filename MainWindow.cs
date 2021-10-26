@@ -74,7 +74,6 @@ namespace MyBrowser
                 Tmp.Text = KV.Key;
                 Tmp.Show();
                 Tmp.Clicked += async delegate {
-                    Console.WriteLine("??? activated!");
                     await navigateTo(KV.Value.ToString(), true);
                 };
                 GotoMenuBox.Add(Tmp);
@@ -264,9 +263,9 @@ namespace MyBrowser
         {
             KeyValuePair<String, String> tmp = new KeyValuePair<string, string>(webtitle ,URLBar.Text);
             fav.Add(tmp);
-            log(tmp.Key + " "+tmp.Value);
+            log("adding favorite: " + tmp.Key + " for " + tmp.Value);
             SerializeNow();
-            
+            updateFavoriteMenu();
         }
 
         
@@ -321,9 +320,9 @@ namespace MyBrowser
             try{
                 Parser Parser = new Parser(Fetcher.LastUri, Fetcher.Body);
                 Title =  "Status Code: " + Fetcher.Code + ", Web Title: " + Parser.getTitle();
+                webtitle = Parser.getTitle();
                 log("Text content:\n" + Parser.getTextSummary());
                 updateGotoMenu(Parser);
-                webtitle = Parser.getTitle();
             }
             catch (Exception e){
                 log("Failed to parse: " + e);
